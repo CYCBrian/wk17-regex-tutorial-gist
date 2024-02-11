@@ -168,6 +168,21 @@ Although our email matching regex does not use the OR operator, it's still good 
 
 ### Flags
 
+Flags are like instruction you put at the end of the regex to tell it how to behave when matching. There are more than the five I'm going to show you here, but these are the more commonly used ones.
+
+- **Global** `g`: This flag will make the regex find all matches rather than stopping after finding the first match.
+
+- **Insensitive** `i`: This flag allows the regex to find matches regardless of letter case.
+
+- **Multiline** `m`: This flag allows the `^` and `$` anchor to match the start and end of every line.
+
+- **Sticky** `s`: This flag allows the `.` metacharacter to match any character, including newline characters.
+
+- **Unicode** `u`: This flag enables support for Unicode character and properties.
+
+You are not limited to just using one flag when creating you regex. You can stick them all in your regex and it'll still work (e.g. `/a*/gimsu`). But do make sure the flags serves the purpose of your regex or you'll just be wasting you precious key presses.
+
+
 ### Character Escapes
 
 ## Deciphering Time
