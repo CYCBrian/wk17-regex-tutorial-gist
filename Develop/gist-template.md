@@ -34,7 +34,117 @@ Before we start though, it's important to understand the common components used 
 
 ### Anchors
 
+Anchors are special characters that act as constraints, telling the regex where to perform its matching function within a string. It's important to note that they don't match to any actual characters, but instead define the boundaries or positions for the regex to do its matching.
+
+The four most commonly used anchors are:
+
+- **Caret** `^`: Tells the regex to match at the beginning of the string.
+     
+     Regex: `/^\w/g`
+     
+     Translation: "Matches any word character at the beginning of the string."
+
+     Example: apples grow from trees
+
+     Result: **a**pples grow from trees
+
+- **Dollar sign** `$`: Tells the regex to match at the end of the string.
+     
+     Regex: `/\w$/g`
+     
+     Translation: "Matches any word character at the end of the string."
+
+     Example: apples grow from trees
+
+     Result: apples grow from tree**s**
+
+- **Word boundary** `\b`: Tells the regex to match a position where the word is not surrounded by other characters.
+     
+     Regex: `/cat\b/g`
+     
+     Translation: "Matches all occurrences of the word 'cat' that are standalone words."
+
+     Example: cat cats catwoman
+
+     Result: **cat** cats catwoman 
+
+- **Not word boundary** `\B`: Tells the regex to match a position where the word is surrounded by other characters.
+     
+     Regex: `/cat\B/g`
+     
+     Translation: "Matches all occurrences of the word 'cat' that are not standalone words."
+
+     Example: cat cats catwoman
+
+     Result: cat **cat**s **cat**woman 
+
+
 ### Quantifiers
+
+Quantifiers tells the regex how many times a particular character or group of characters should appear in the text for a match to occur. They help the regex know if these characters or group of characters should be option, required, or repeated a certain number of times.
+
+- **Asterisk** `*`: Tells the regex to match zero or more occurrences of the preceding character or character group.
+
+     Regex: `/a*/g`
+     
+     Translation: Match any sequence of zero or more 'a' characters.
+
+     Example: a aa aaa aaa aaaa
+
+     Result: **a** **aa** **aaa** **aaa** **aaaa**
+
+- **Plus** `+`: Tells the regex to match one or more occurrences of the preceding character or character group.
+
+     Regex: `/a+/g`
+     
+     Translation: Match any sequence of one or more 'a' characters.
+
+     Example: a aa aaa aaa aaaa
+
+     Result: **a** **aa** **aaa** **aaa** **aaaa**
+
+     - You might look at the results of the previous two quantifiers and think "Wait! Don't they both end up looking the same? What's the difference?" The difference lies in the requirement for the preceding character or character group. Specifically, `*` allows **zero** or more occurrences, while `+` requires **one** or more occurrences. Because `*` matches zero or more occurrences, it actually counts any empty string (where the character 'a' has occurred zero times) as a match as well, resulting in double the match. On the other hand, `+` only results in a match if the preceding character or character group is an 'a' as well. An easier way of understanding the difference is that `+` is more strict that `*` when it comes to producing matches.
+
+- **Question mark** `?`: Tells the regex that its preceding character can occur 0 or 1 times, essentially making that character optional. This I find is useful if you want to match words that have alternative spelling.
+     
+     Regex: `/colou?r/g`
+     
+     Translation: Match strings that contain the word 'color' followed by zero or one occurrences of the letters 'u'.
+
+     Example: color colour
+
+     Result: **color** **colour**
+
+     - There are words with alternative spelling that will require a more robust regex configuration (e.g. center and centre). But for now the above example should help you in understanding the use of '?'
+
+- **Curly braces** `{}`: Tells the regex to match a specific range or exact number of occurrences of the preceding element, depending on how you configure the quantifier.
+     
+     Regex: `/a{3}/g`
+     
+     Translation: Match strings that contain the character 'a' exactly 3 times.
+
+     Example: a aa aaa aaaa aaaaa aaaaaa
+
+     Result: a aa **aaa** **aaa**a **aaa**aa **aaaaaa**
+
+     - Note: Because the last group of 'a's has a length of 6, the matching will occur twice there, resulting in it looking like the whole character group was matched even though we specified the regex to only match 3 times. This is because quantifiers are 'greedy' by default, meaning the regex will attempt to match the maximum number of occurrences.
+          
+     Regex: `/b{3,}/g`
+     
+     Translation: Match strings that contain the character 'b' 3 or more times.
+
+     Example: b bb bbb bbbb bbbbb bbbbbb
+
+     Result: b bb **bbb** **bbbb** **bbbbb** **bbbbbb**
+          
+     Regex: `/c{3,4}/g`
+     
+     Translation: Match strings that contain the character 'c' with a minimum of 3 times and a maximum of 4 times.
+
+     Example: c cc ccc cccc ccccc cccccc
+
+     Result: c cc **ccc** **cccc** **cccc**c **cccc**cc
+
 
 ### Grouping Constructs
 
@@ -43,6 +153,18 @@ Before we start though, it's important to understand the common components used 
 ### Character Classes
 
 ### The OR Operator
+
+The OR operator, denoted by the `|` symbol, give a lits of choices for the regex to match.
+
+For example, if you want write a regex that matches either "cat" or "dog" in a string, you would use `/cat|dog|/g`.
+
+Which would result in:
+
+**cat** bat **dog** cog **dog** log sat **cat**
+
+Interestingly, you're not limited to only two choices. If you want to add in more alternative to the regex, simply add another `|` and then the next alternative e.g. `/cat|dog|log/g`.
+
+Although our email matching regex does not use the OR operator, it's still good to understand what it does in case you ever want to use it in creating future regex.
 
 ### Flags
 
