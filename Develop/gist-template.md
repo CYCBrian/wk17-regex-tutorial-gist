@@ -150,7 +150,57 @@ Quantifiers tells the regex how many times a particular character or group of ch
 
 ### Bracket Expressions
 
+Bracket expressions refers to any expression enclosed within square brackets that tells the regex what to match. They allow you to manually configure what type of characters to match or not match, and are more customizable than character classes, which we will discuss later.
+
 ### Character Classes
+
+Character classes are similar to bracket expressions, but they are predefined patterns so you don't need to wrap them around a '[]'.
+
+Commonly used character classes are:
+
+- **Word** `\w`: Equivalent to `[a-zA-Z0-9_]`. Tells the regex to match any alphanumeric characters and underscores. Note that \w will not match any accented characters or non-roman characters.
+     
+     Example: abc 123 áéí !@#
+
+     Result: **abc** **123** áéí !@#
+
+- **Not word** `\W`: Equivalent to `[^a-zA-z0-9_]`. Tells the regex to match any characters that are not alphanumeric or underscores.
+     
+     Example: abc 123 áéí !@#
+
+     Result: abc 123 **áéí** **!@#**
+          
+     - Note: It will also match the white spaces between the character groups. In the example above, `\W` will result in 9 matches.
+
+- **Digit** `\d`: Equivalent to `[0-9]`. Tells the regex to match any digits.
+     
+     Example: abc 123 áéí !@#
+
+     Result: abc **123** áéí !@#
+
+- **Not digit** `\D`: Equivalent to `[^0-9]`. Tells the regex to any characters that are not digits.
+     
+     Example: abc 123 áéí !@#
+
+     Result: **abc** 123 **áéí** **!@#**
+          
+     - Note: Again, it will also match the white spaces between the character groups. In the example above, `\D` will result in 12 matches.
+
+- **Whitespace** `\s`: Equivalent to `[\t\n\r\f\v]`. Tells the regex to match any whitespace characters (i.e. tab, newline, carriage return, form feed, and vertical tab characters). It's generally preferred to just use \s.
+     
+     Example: abc 123 áéí !@#
+
+     Result: abc 123 áéí !@#
+          
+     - Note: You can't see any difference between the example and the result because I can't bold whitespace, but in the example above, `\s` will result in 3 matches.
+
+- **Not whitespace** `\S`: Equivalent to `[^\t\n\r\f\v]`. Tells the regex to match any characters that are not whitespace characters (i.e. tab, newline, carriage return, form feed, and vertical tab characters). It's also generally preferred to just use \S.
+
+     Example: abc 123 áéí !@#
+
+     Result: **abc** **123** **áéí** **!@#**
+
+You can wrap character classes inside a bracket expression to for further customization. For example, if you wrap /s and /S inside a bracket, the regex will match EVERYTHING!!! (i.e. `/[\s\S]/g`)
 
 ### The OR Operator
 
