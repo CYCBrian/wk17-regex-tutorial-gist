@@ -325,10 +325,116 @@ You are not limited to just using one flag when creating you regex. You can stic
 
 ## Deciphering Time
 
+Now that we've covered the basics of regex, we can finally start deciphering the email match regex shown at the beginning.
+
+Here it is again:
+
+/^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$/
+
+First, there are the caret and dollar sign [anchors](#anchors):
+
+/`^`([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})`$`/
+
+The caret tells the regex to match from the beginning, and ensure that the email address starts with the specified pattern.
+
+The dollar sign tells the regex to match until the end of the string, and ensures that the email address ends with the specified pattern.
+
+Together, they tell the regex to make sure that the entire string matches the pattern.
+
+Next we can see that the regex has created three unnamed [capture groups](#grouping-constructs):
+
+/^`(`[a-z0-9_\\.-]+`)`@`(`[\\da-z\\.-]+`)`\\.`(`[a-z\\.]{2,6}`)`$/
+
+Let's start with the first capture group:
+
+([a-z0-9_\\.-]+)
+
+The first capture group uses a [bracket](#bracket-expressions) `[]` to configure a custom character class.
+
+(`[`a-z0-9_\\.-`]`+)
+
+Inside the bracket expression, it specific two ranges; a-z and 0-9.
+
+([`a-z``0-9`_\\.-]+)
+
+This tells regex to match any lowercase letters and digits.
+
+It's also tell regex to match any underscores `_`.
+
+([a-z0-9`_`\\.-]+)
+
+Then by using [character escapes](#character-escapes), it tell regex to treat the period `.` literally.
+
+([a-z0-9_`\.`-]+)
+
+The bracket ends with telling regex to match dash `-`.
+
+([a-z0-9_\\.`-`]+)
+
+Finally we have a [plus sign](#quantifiers), telling regex that the previous component (the character set) can occur one or more times.
+
+([a-z0-9_\\.-]`+`)
+
+Together, the first capture group wants regex to "Match any sequence of lowercase letters, digits, underscores, dots, and dashes."
+
+So far so good? Awesome! Let's keep going.
+
+Next, we see the at sign `@`. Nothing special here, it just mean we want to match a `@`.
+
+/^([a-z0-9_\\.-]+)`@`([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$/
+
+Onto the second capture group:
+
+([\\da-z\\.-]+)
+
+It's mostly the same as the first capture group. Except this time the pattern uses the [character class](#character-classes) of `\d` instead of a range to match any digits.
+
+([`\d`a-z\\.-]+)
+
+Aside from the underscore `_` not being included, this group is almost identical to the first capture group in terms of what it wants regex to match.
+
+Basically: "Match any sequence of lowercase letters, digits, dots, and dashes.
+
+The second capture group is followed by a [character escape](#character-escapes) and a period `.`. Like the ones we see in the capture groups we've deciphered so far, it's telling regex to treat the period literally.
+
+We're almost done!
+
+The third capture group looks like this:
+
+([a-z\\.]{2,6})
+
+Here we see another [bracket expression](#bracket-expressions) that matches any lowercase letter from a to z, as well as an escaped period `.`
+
+(`[a-z\\.]`{2,6})
+
+This group also [quantifies](#quantifiers) the number of time the specified characters in the bracket expression can occur. In this case, in order to match, the number of occurrences must fall between a minimum of 2 and a maximum of 6.
+
+With everything taken together. the whole regex translate to:
+
+"The string should start with a group of characters that can include lowercase letters, digits, underscores, periods, and hyphens, followed by an at symbol. Then, it is followed by another group of characters that can include digits, lowercase letters, periods, and hyphens, followed by a period. Finally, it is followed by a group of lowercase letters and periods that has a length between 2 and 6 characters. The string should end after this."
+
 ## Closing
+
+And there you have it! After 6 years, 2 failed marriages, and a burning desire to throw your computer against a wall, you've finally learned the basic of regex configuration, and successfully decipher a regex used to match emails!
+
+This guide ended up being a lot longer than I had initially planned. I made this guide having just started learning about regex, so I wrote this from the perspective of someone who has never used or heard of regex and wanted as much guidance as possible. It's much a guide for you as it is for me.
+
+With this being a beginner's guide, there's still a lot about regex we didn't cover here. Things like backreference constructs, boundaries, and lookaround assertion are far outside the scope of the guide.
+
+However, I hope that this has help ease you into getting comfortable with regex and made it just a little easier for you. Good luck on your web development studies!
 
 ## Resources
 
+[Regular Expressions](https://eloquentjavascript.net/09_regexp.html)
+
+[MDN Web Docs on regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
+
+[Quick-Start: Regex Cheat Sheet](https://www.rexegg.com/regex-quickstart.html)
+
+[Regex101](https://regex101.com/)
+
+[Untitled Pattern](https://regexr.com/)
+
 ## Author
 
-A short section about the author with a link to the author's GitHub profile (replace with your information and a link to your profile)
+[Hi! It's me. IT'S ME! I'm Brian. I'm currently studying web development in hope of working in the field some day. Check out my GitHub profile here.](https://github.com/CYCBrian)
