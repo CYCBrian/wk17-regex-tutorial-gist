@@ -20,12 +20,12 @@ Before we start though, it's important to understand the common components used 
 - [Regex Components](#regex-components)
      - [Anchors](#anchors)
      - [Quantifiers](#quantifiers)
-     - [Grouping Constructs](#grouping-constructs)
      - [Bracket Expressions](#bracket-expressions)
      - [Character Classes](#character-classes)
      - [The OR Operator](#the-or-operator)
-     - [Flags](#flags)
+     - [Grouping Constructs](#grouping-constructs)
      - [Character Escapes](#character-escapes)
+     - [Flags](#flags)
 - [Deciphering Time](#deciphering-time)
 - [Closing](#closing)
 - [Resources](#resources)
@@ -147,50 +147,6 @@ Quantifiers tells the regex how many times a particular character or group of ch
 
      Result: c cc **ccc** **cccc** **cccc**c **cccc**cc
 
-
-### Grouping Constructs
-
-Grouping constructs allow you to group parts of a matching pattern together. It helps you organize and structure you regex and allows you to extract an manipulate specific groups of match strings and create more complex patterns.
-
-Capturing group is done by wrapping parts of your regex with a `()`. For example, if I want to capture the area code of a phone number in order to gauge where my business is getting the most calls from, I would first create a regex to match a phone number:
-
-`^\d{3}-\d{3}-\d{4}$`
-
-Translation: Assert the start of the string. Then match exactly three digits. Match a hyphen. Match another three digits. Match another hyphen. Now match 4 digits. Assert the end of the string.
-
-Then I would add a `()` around `\d{3}` so that I capture the area code.
-
-`^(\d{3})-\d{3}-\d{4}$`
-
-And there you have it. When I match a phone number, I can later call on the captured group to extract the area code of the phone number and do something to it in JavaScript.
-
-          const phoneNumber = "123-456-7890";
-          const regex = /^(\d{3})-\d{3}-\d{4}$/;
-          const match = phoneNumber.match(regex);
-          const areaCode = match[1]; // Extracted area code using the numerical index
-
-You can also name you capture groups. This is especially helpful if you have multiple capture groups that you want to manipulate later and don't exactly remember the index of the group you want to capture.
-
-Naming you captured group is done by adding `?<`name`>` before you configure you regex for the captured group.
-
-`^(?<areaCode>\d{3})-\d{3}-\d{4}$`
-
-Now, when you extract it, you can simply call on the name to get the area code of the phone number.
-
-          const phoneNumber = "123-456-7890";
-          const regex = /^(?<areaCode>\d{3})-\d{3}-\d{4}$/;
-          const match = phoneNumber.match(regex);
-          const areaCode = match.groups.areaCode; // Extracted area code using the named group
-
-To further organize you regex, you can wrap parts of it in something called a non-capturing group. They are similar to a capture group, except they do not capture the matched content, and you wont be able to extract and manipulate it later.
-
-To add a non-capturing group, you can wrap the part of the regex that you need to match but not use in a (?:)
-
-`/^(?<areaCode>\d{3})-(?:\d{3}-\d{4})$/`
-
-Now the regex will match a phone number, but will only allow me to extract and manipulate the name captured group of 'areacode' and "discard" the rest.
-
-
 ### Bracket Expressions
 
 Bracket expressions refers to any expression enclosed within square brackets `[]` that results in a character class (I'll touch on character class in the next section). They allow you to manually configure what type of characters to match or not match.
@@ -230,7 +186,6 @@ Some common use of bracket expressions are:
      Example: abcdefg12345678
 
      Result: **abc**defg**12345**678
-
 
 ### Character Classes
 
@@ -296,6 +251,62 @@ Interestingly, you're not limited to only two choices. If you want to add in mor
 
 Although our email matching regex does not use the OR operator, it's still good to understand what it does in case you ever want to use it when creating you own regex.
 
+### Grouping Constructs
+
+Grouping constructs allow you to group parts of a matching pattern together. It helps you organize and structure you regex and allows you to extract an manipulate specific groups of match strings and create more complex patterns.
+
+Capturing group is done by wrapping parts of your regex with a `()`. For example, if I want to capture the area code of a phone number in order to gauge where my business is getting the most calls from, I would first create a regex to match a phone number:
+
+`^\d{3}-\d{3}-\d{4}$`
+
+Translation: Assert the start of the string. Then match exactly three digits. Match a hyphen. Match another three digits. Match another hyphen. Now match 4 digits. Assert the end of the string.
+
+Then I would add a `()` around `\d{3}` so that I capture the area code.
+
+`^(\d{3})-\d{3}-\d{4}$`
+
+And there you have it. When I match a phone number, I can later call on the captured group to extract the area code of the phone number and do something to it in JavaScript.
+
+          const phoneNumber = "123-456-7890";
+          const regex = /^(\d{3})-\d{3}-\d{4}$/;
+          const match = phoneNumber.match(regex);
+          const areaCode = match[1]; // Extracted area code using the numerical index
+
+You can also name you capture groups. This is especially helpful if you have multiple capture groups that you want to manipulate later and don't exactly remember the index of the group you want to capture.
+
+Naming you captured group is done by adding `?<`name`>` before you configure you regex for the captured group.
+
+`^(?<areaCode>\d{3})-\d{3}-\d{4}$`
+
+Now, when you extract it, you can simply call on the name to get the area code of the phone number.
+
+          const phoneNumber = "123-456-7890";
+          const regex = /^(?<areaCode>\d{3})-\d{3}-\d{4}$/;
+          const match = phoneNumber.match(regex);
+          const areaCode = match.groups.areaCode; // Extracted area code using the named group
+
+To further organize you regex, you can wrap parts of it in something called a non-capturing group. They are similar to a capture group, except they do not capture the matched content, and you wont be able to extract and manipulate it later.
+
+To add a non-capturing group, you can wrap the part of the regex that you need to match but not use in a (?:)
+
+`/^(?<areaCode>\d{3})-(?:\d{3}-\d{4})$/`
+
+Now the regex will match a phone number, but will only allow me to extract and manipulate the name captured group of 'areacode' and "discard" the rest.
+
+### Character Escapes
+
+Some character have embedded functions within the regex syntax (i.e. `+ * ? ^ $ \ . [ ] { } ( ) | /`). We've actually seen them being used throughout this tutorial.
+
+But what happens if you want to make a regex that matches one or more of these "metacharacters". That's where character escapes come in.
+
+Character escapes allows you to tell the regex to treat these characters literally.
+
+All you need to do it add a `\` before the metacharacter
+
+For example, `\.` would tell regex to treat `.` as a literal period instead of treating it as a metacharacter that matches any character except for newline.
+
+It's **LITERALLY** that simple! Get it? HA HA HA HA HA HA HA HA HA HA! I SAID LAUGH!!!
+
 ### Flags
 
 Flags are like instruction you put at the end of the regex to tell it how to behave when matching. There are more than the five I'm going to show you here, but these are the more commonly used ones.
@@ -311,9 +322,6 @@ Flags are like instruction you put at the end of the regex to tell it how to beh
 - **Unicode** `u`: This flag enables support for Unicode character and properties.
 
 You are not limited to just using one flag when creating you regex. You can stick them all in your regex and it'll still work (e.g. `/a*/gimsu`). But do make sure the flags serves the purpose of your regex or you'll just be wasting precious milliseconds.
-
-
-### Character Escapes
 
 ## Deciphering Time
 
