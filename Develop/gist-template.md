@@ -34,7 +34,9 @@ Before we start though, it's important to understand the common components used 
 
 ### Anchors
 
-Anchors are special characters that act as constraints, telling the regex where to perform its matching function within a string. It's important to note that they don't match to any actual characters, but instead define the boundaries or positions for the regex to do its matching.
+Anchors are special characters that act as constraints, telling the regex where to perform its matching function within a string.
+
+It's important to note that they don't match to any actual characters, but instead define the boundaries or positions for the regex to do its matching.
 
 The four most commonly used anchors are:
 
@@ -103,7 +105,7 @@ Quantifiers tells the regex how many times a particular character or group of ch
 
      Result: **a** **aa** **aaa** **aaa** **aaaa**
 
-     - You might look at the results of the previous two quantifiers and think "Wait! Don't they both end up looking the same? What's the difference?" The difference lies in the requirement for the preceding character or character group. Specifically, `*` allows **zero** or more occurrences, while `+` requires **one** or more occurrences. Because `*` matches zero or more occurrences, it actually counts any empty string (where the character 'a' has occurred zero times) as a match as well, resulting in double the match. On the other hand, `+` only results in a match if the preceding character or character group is an 'a' as well. An easier way of understanding the difference is that `+` is more strict that `*` when it comes to producing matches.
+     - You might look at the results of the previous two quantifiers and think "Wait! Don't they both end up looking the same? What's the difference?" The difference lies in the requirement for the preceding character or character group. Specifically, `*` allows **zero** or more occurrences, while `+` requires **one** or more occurrences. Because `*` matches zero or more occurrences, it actually counts any empty string (i.e. where the character 'a' has occurred zero times, like the white spaces) as a match as well. On the other hand, `+` only results in a match if the preceding character or character group is an 'a' as well. An easier way of understanding the difference is that `+` is more strict that `*` when it comes to producing matches.
 
 - **Question mark** `?`: Tells the regex that its preceding character can occur 0 or 1 times, essentially making that character optional. This I find is useful if you want to match words that have alternative spelling.
      
@@ -115,7 +117,7 @@ Quantifiers tells the regex how many times a particular character or group of ch
 
      Result: **color** **colour**
 
-     - There are words with alternative spelling that will require a more robust regex configuration (e.g. center and centre). But for now the above example should help you in understanding the use of '?'
+     - There are words with alternative spelling that will require a more robust regex configuration (e.g. center and centre). But for now the above example should help you understand the use of '?'
 
 - **Curly braces** `{}`: Tells the regex to match a specific range or exact number of occurrences of the preceding element, depending on how you configure the quantifier.
      
@@ -148,9 +150,87 @@ Quantifiers tells the regex how many times a particular character or group of ch
 
 ### Grouping Constructs
 
+Grouping constructs allow you to group parts of a matching pattern together. It helps you organize and structure you regex and allows you to extract an manipulate specific groups of match strings and create more complex patterns.
+
+Capturing group is done by wrapping parts of your regex with a `()`. For example, if I want to capture the area code of a phone number in order to gauge where my business is getting the most calls from, I would first create a regex to match a phone number:
+
+`^\d{3}-\d{3}-\d{4}$`
+
+Translation: Assert the start of the string. Then match exactly three digits. Match a hyphen. Match another three digits. Match another hyphen. Now match 4 digits. Assert the end of the string.
+
+Then I would add a `()` around `\d{3}` so that I capture the area code.
+
+`^(\d{3})-\d{3}-\d{4}$`
+
+And there you have it. When I match a phone number, I can later call on the captured group to extract the area code of the phone number and do something to it in JavaScript.
+
+          const phoneNumber = "123-456-7890";
+          const regex = /^(\d{3})-\d{3}-\d{4}$/;
+          const match = phoneNumber.match(regex);
+          const areaCode = match[1]; // Extracted area code using the numerical index
+
+You can also name you capture groups. This is especially helpful if you have multiple capture groups that you want to manipulate later and don't exactly remember the index of the group you want to capture.
+
+Naming you captured group is done by adding `?<`name`>` before you configure you regex for the captured group.
+
+`^(?<areaCode>\d{3})-\d{3}-\d{4}$`
+
+Now, when you extract it, you can simply call on the name to get the area code of the phone number.
+
+          const phoneNumber = "123-456-7890";
+          const regex = /^(?<areaCode>\d{3})-\d{3}-\d{4}$/;
+          const match = phoneNumber.match(regex);
+          const areaCode = match.groups.areaCode; // Extracted area code using the named group
+
+To further organize you regex, you can wrap parts of it in something called a non-capturing group. They are similar to a capture group, except they do not capture the matched content, and you wont be able to extract and manipulate it later.
+
+To add a non-capturing group, you can wrap the part of the regex that you need to match but not use in a (?:)
+
+`/^(?<areaCode>\d{3})-(?:\d{3}-\d{4})$/`
+
+Now the regex will match a phone number, but will only allow me to extract and manipulate the name captured group of 'areacode' and "discard" the rest.
+
+
 ### Bracket Expressions
 
-Bracket expressions refers to any expression enclosed within square brackets that tells the regex what to match. They allow you to manually configure what type of characters to match or not match, and are more customizable than character classes, which we will discuss later.
+Bracket expressions refers to any expression enclosed within square brackets `[]` that results in a character class (I'll touch on character class in the next section). They allow you to manually configure what type of characters to match or not match.
+
+Know that **most** metacharacters (i.e. characters that have a special function in regex) lose their function when inside a `[]` and become a literal character instead.
+
+Some common use of bracket expressions are:
+
+- **Matching specific characters** `[]`: Match any characters within the `[]`
+
+     Regex: `/[aeiou1357@]/g`
+
+     Translation: Match any occurrences of 'a' 'e' 'i' 'o' 'u' '1' '3' '5' '7' '@'.
+
+     Example: abc 123 áéí !@#
+
+     Result: **a**bc **1**2**3** áéí !**@**#
+
+- **Negating specific characters** `[^]`:  Match any other characters aside from 'a' 'e' 'i' 'o' 'u' '1' '3' '5' '7' '@'.
+
+     Regex: `/[^aeiou1357@]/g`
+
+     Translation: Match any characters in this set.
+
+     Example: abc 123 áéí !@#
+
+     Result: a**bc** 1**2**3 **áéí** **!**@**#**
+
+     - Because white spaces are also considered characters, the above regex would actually results in 11 matches. If you want the regex to also ignore white spaces, just add a ' ' (i.e. `/[^aeiou1357@ ]/g`)
+
+- **Establish a range of characters** `[-]`:  Defines a range of characters for the regex to match.
+
+     Regex: `/[a-c0-5]/g`
+
+     Translation: Match any characters within the range of 'a' to 'c' and '0' to '5'.
+
+     Example: abcdefg12345678
+
+     Result: **abc**defg**12345**678
+
 
 ### Character Classes
 
@@ -186,15 +266,15 @@ Commonly used character classes are:
           
      - Note: Again, it will also match the white spaces between the character groups. In the example above, `\D` will result in 12 matches.
 
-- **Whitespace** `\s`: Equivalent to `[\t\n\r\f\v]`. Tells the regex to match any whitespace characters (i.e. tab, newline, carriage return, form feed, and vertical tab characters). It's generally preferred to just use \s.
+- **White space** `\s`: Equivalent to `[\t\n\r\f\v]`. Tells the regex to match any white space characters (i.e. tab, newline, carriage return, form feed, and vertical tab characters). It's generally preferred to just use \s.
      
      Example: abc 123 áéí !@#
 
      Result: abc 123 áéí !@#
           
-     - Note: You can't see any difference between the example and the result because I can't bold whitespace, but in the example above, `\s` will result in 3 matches.
+     - Note: You can't see any differences between the example and the result because I don't even know if I can bold white spaces, but in the example above, `\s` will result in 3 matches.
 
-- **Not whitespace** `\S`: Equivalent to `[^\t\n\r\f\v]`. Tells the regex to match any characters that are not whitespace characters (i.e. tab, newline, carriage return, form feed, and vertical tab characters). It's also generally preferred to just use \S.
+- **Not white space** `\S`: Equivalent to `[^\t\n\r\f\v]`. Tells the regex to match any characters that are not white space characters (i.e. tab, newline, carriage return, form feed, and vertical tab characters). It's also generally preferred to just use \S.
 
      Example: abc 123 áéí !@#
 
@@ -214,7 +294,7 @@ Which would result in:
 
 Interestingly, you're not limited to only two choices. If you want to add in more alternative to the regex, simply add another `|` and then the next alternative e.g. `/cat|dog|log/g`.
 
-Although our email matching regex does not use the OR operator, it's still good to understand what it does in case you ever want to use it in creating future regex.
+Although our email matching regex does not use the OR operator, it's still good to understand what it does in case you ever want to use it when creating you own regex.
 
 ### Flags
 
@@ -230,7 +310,7 @@ Flags are like instruction you put at the end of the regex to tell it how to beh
 
 - **Unicode** `u`: This flag enables support for Unicode character and properties.
 
-You are not limited to just using one flag when creating you regex. You can stick them all in your regex and it'll still work (e.g. `/a*/gimsu`). But do make sure the flags serves the purpose of your regex or you'll just be wasting you precious key presses.
+You are not limited to just using one flag when creating you regex. You can stick them all in your regex and it'll still work (e.g. `/a*/gimsu`). But do make sure the flags serves the purpose of your regex or you'll just be wasting precious milliseconds.
 
 
 ### Character Escapes
